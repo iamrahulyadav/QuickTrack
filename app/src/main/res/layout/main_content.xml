@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:background="@color/gallery_white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context="app.quicktrack.activities.MainActivity">
+
+    <include layout="@layout/home_toolbar" />
+
+    <RelativeLayout
+        android:layout_below="@+id/toolbar"
+        android:layout_above="@+id/gridContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_margin="30dp"
+            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/icon"
+            android:layout_width="150dp"
+            android:layout_height="150dp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:padding="10dp"
+        android:layout_above="@+id/buttonContactUs"
+        android:id="@+id/gridContainer"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:weightSum="3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:onClick="gotoMapView"
+                style="@style/DashButtonStyle"
+                android:drawableTop="@drawable/location"
+                android:text="Map View"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:onClick="gotoListView"
+                style="@style/DashButtonStyle"
+                android:drawableTop="@drawable/list_view"
+                android:text="List View"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:onClick="gotoAlertList"
+                style="@style/DashButtonStyle"
+                android:drawableTop="@drawable/alert"
+                android:text="Alert List"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:weightSum="3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:onClick="gotoNotification"
+                style="@style/DashButtonStyle"
+                android:drawableTop="@drawable/notification"
+                android:text="Notification"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:onClick="gotoTrackHistory"
+                style="@style/DashButtonStyle"
+                android:drawableTop="@drawable/track"
+                android:text="Track History"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:onClick="gotoProfile"
+                style="@style/DashButtonStyle"
+                android:drawableTop="@drawable/profile"
+                android:text="Profile"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:onClick="gotoContactUs"
+        android:layout_marginBottom="20dp"
+
+        android:layout_alignParentBottom="true"
+        android:id="@+id/buttonContactUs"
+        style="@style/AppButton"
+        android:text="Contact Us"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>

@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">QuickTrack</string>
+    <string name="drawer_open">open drawer</string>
+    <string name="drawer_close">close drawer</string>
+    <string name="deviceTem">Device Tempered</string>
+    <string name="overspeed">Over Speed</string>
+    <string name="batterylow">Battery Low</string>
+    <string name="off">OFF</string>
+    <string name="on">ON</string>
+    <string name="forgotpassword">Forgot password?</string>
+    <string name="forgotpasswordtxt">We just need your registered Email id\n to send you password Reset instructions.</string>
+    <string name="resetpassword">Reset password</string>
+    <string name="registeredemailid">Registered Email id</string>
+
+
+    <!--activity login-->
+    <string name="edtPass">Password</string>
+    <string name="edtUserName">Username</string>
+    <string name="btnLogin">Login</string>
+    <string name="txtRememberPass">Remember Password</string>
+    <string name="txtForgotPass">Forgot Password ?</string>
+
+</resources>

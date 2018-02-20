@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="app.quicktrack.activities.LoginActivity">
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_below="@+id/toolbar"
+        android:scaleType="centerCrop"
+        android:src="@drawable/splash_png"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:padding="20dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/icn_logo"
+            android:layout_marginBottom="30dp"
+            android:src="@drawable/icon"
+            android:layout_width="100dp"
+            android:layout_height="100dp" />
+        <LinearLayout
+            android:layout_marginBottom="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/login_radio_user"
+                android:text="User"
+                android:checked="true"/>
+
+            <RadioButton
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:id="@+id/login_radio_driver"
+                android:text="Vehicle by login "
+               />
+
+        </LinearLayout>
+
+        <EditText
+            android:drawableLeft="@drawable/ic_user"
+            android:drawableStart="@drawable/ic_user"
+            android:padding="10dp"
+            style="@style/AppEditText"
+            android:textSize="@dimen/small_size"
+            android:drawablePadding="10dp"
+            android:hint="@string/edtUserName"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:id="@+id/etUsername"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"/>
+
+        <EditText
+            android:drawableLeft="@drawable/ic_lock"
+            android:drawableStart="@drawable/ic_lock"
+            android:padding="10dp"
+            android:imeOptions="actionDone"
+            android:inputType="textPassword"
+            android:textSize="@dimen/small_size"
+            android:drawablePadding="10dp"
+            style="@style/AppEditText"
+            android:hint="@string/edtPass"
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginBottom="10dp"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="5dp">
+            <CheckBox
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:visibility="gone"
+                android:textSize="@dimen/extra_small_size"
+                android:textColor="@color/black"
+                android:text="@string/txtRememberPass"
+                android:id="@+id/checkboxRemember"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="@dimen/extra_small_size"
+                android:paddingLeft="15dp"
+                android:textColor="@color/black"
+                android:id="@+id/txtForgot"
+                android:text="@string/txtForgotPass"
+                android:gravity="center_vertical|left"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:gravity="center"
+            style="@style/AppRoundedButton"
+            android:text="@string/btnLogin"
+            android:layout_width="150dp"
+            android:layout_height="40dp" />
+    </LinearLayout>
+
+    
+</RelativeLayout>

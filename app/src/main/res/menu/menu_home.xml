@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:title="Home"
+        android:icon="@drawable/nav_home"/>
+    <item android:title="System Management"
+        android:id="@+id/nav_system_mgnt">
+        <group
+            android:enabled="true"
+            android:visible="true">
+            <item android:title="Map View"
+                android:icon="@drawable/end"/>
+            <item android:title="List View"
+                android:icon="@drawable/medium"/>
+            <item android:title="Alert View"
+                android:icon="@drawable/medium"/>
+            <item android:title="Notification"
+                android:icon="@drawable/medium"/>
+            <item android:title="Track History"
+                android:icon="@drawable/start"/>
+        </group>
+    </item>
+    <item android:title="My Profile"
+        android:icon="@drawable/nav_update_profile"/>
+    <item android:title="Contact"
+        android:icon="@drawable/nav_contact"/>
+    <item android:title="Logout"
+        android:icon="@drawable/nav_logout"/>
+</menu>

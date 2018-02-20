@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="@color/gallery_white"
+    android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+       >
+        <ImageView
+            android:id="@+id/btnHome"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp"
+            android:src="@drawable/menu_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:layout_toRightOf="@+id/btnHome"
+            android:layout_toEndOf="@+id/btnHome"
+            android:layout_toLeftOf="@+id/btnOption"
+            android:layout_toStartOf="@+id/btnOption"
+            android:textColor="#fff"
+            style="@style/TextAppearance.AppCompat.Headline"
+            android:gravity="center"
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:visibility="invisible"
+            android:id="@+id/btnOption"
+            android:padding="10dp"
+            android:src="@drawable/back"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+    </RelativeLayout>
+</android.support.v7.widget.Toolbar>

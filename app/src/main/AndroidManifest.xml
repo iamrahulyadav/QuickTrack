@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="app.quicktrack">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <permission
+        android:name="in.wptrafficanalyzer.locationgooglemapviewsv2.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="in.wptrafficanalyzer.locationgooglemapviewsv2.permission.MAPS_RECEIVE"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+
+    <application
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="app.quicktrack.activities.android.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"></meta-data>
+        </provider>
+
+        <activity android:name=".activities.MainActivity" />
+        <activity android:name=".activities.SplashActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".activities.LoginActivity" />
+        <activity
+            android:name=".activities.MapViewActivity"
+            android:label="Map View" />
+        <activity
+            android:name=".activities.ListViewActivity"
+            android:label="List View"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.AlertListActivity"
+            android:label="Alert List" />
+        <activity
+            android:name=".activities.NotificationActivity"
+            android:label="Notification" />
+        <activity
+            android:name=".activities.TrackHistoryActivity"
+            android:label="Track History"
+            android:windowSoftInputMode="stateHidden"/>
+        <activity
+            android:name=".activities.EditProfileActivity"
+            android:label="Profile"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".activities.ContactUsActivity"
+            android:label="Contact Us" />
+        <activity android:name=".activities.ChangePasswordActivity" />
+        <activity
+            android:name=".activities.ForgotPassword"
+            android:windowSoftInputMode="stateHidden" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAp-4py1BmVVoF7q4TdYogCkVX5vO5qPPk" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <activity android:name=".activities.MyProfileActivity" />
+        <activity android:name=".activities.DeviceDetailActivity" />
+
+        <service android:name=".utils.BroadcastService" />
+
+        <activity android:name=".activities.HistoryDetailsActivity"
+            android:windowSoftInputMode="stateHidden"/>
+
+    </application>
+
+</manifest>
