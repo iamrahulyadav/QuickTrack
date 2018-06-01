@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import app.quicktrack.models.Data;
 import app.quicktrack.models.DeviceData;
 import app.quicktrack.models.DeviceDetails;
 import app.quicktrack.models.DeviceListRequest;
@@ -27,8 +29,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static app.quicktrack.activities.DeviceDetailActivity.deviceId;
-
 /**
  * Created by ask on 1/2/2018.
  */
@@ -39,6 +39,8 @@ public class BroadcastService extends Service {
     private final Handler handler = new Handler();
     Intent intent;
     int startId;
+    public static int counter = 0;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -50,15 +52,16 @@ public class BroadcastService extends Service {
     public void onStart(Intent intent, int startId) {
         this.startId=startId;
         handler.removeCallbacks(sendUpdatesToUI);
-        handler.postDelayed(sendUpdatesToUI, 10000); // 10 second
+        handler.postDelayed(sendUpdatesToUI, 1000); // 2 second
 
     }
 
     private Runnable sendUpdatesToUI = new Runnable() {
         public void run() {
 //            DisplayLoggingInfo();
+
             getDeviceList();
-            handler.postDelayed(this, 2000); // 2 seconds
+            handler.postDelayed(this, 5000); // 10 seconds
         }
     };
 
@@ -76,8 +79,10 @@ public class BroadcastService extends Service {
     public static final MediaType MEDIA_TYPE = MediaType.parse("application/json");
 
     Gson gson = new Gson();
+    String deviceId;
     public void getDeviceList(){
         DeviceMapRequest deviceMapRequest = new DeviceMapRequest();
+        deviceId = Data.getDeviceId();
         deviceMapRequest.setDeviceid(deviceId);
         deviceMapRequest.setLimit(1);
 

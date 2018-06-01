@@ -5,7 +5,14 @@ package app.quicktrack.models;
  */
 
 public class Data {
-    public ProfileData user_data;
-    public ContactUs contact_us;
 
+    public static String deviceId;
+
+    public static String getDeviceId() {
+        return deviceId;
+    }
+
+    public static void setDeviceId(String deviceId) {
+        Data.deviceId = deviceId;
+    }
 }

@@ -28,6 +28,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -60,6 +61,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static app.quicktrack.utils.Utility.bitmapDescriptorFromVectorG;
+import static app.quicktrack.utils.Utility.bitmapDescriptorFromVectorR;
+import static app.quicktrack.utils.Utility.bitmapDescriptorFromVectorY;
 
 public class HistoryDetailsActivity extends AppBaseActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
@@ -155,29 +160,29 @@ public class HistoryDetailsActivity extends AppBaseActivity implements OnMapRead
                 int red=0, yellow=0, green=0;
                 switch (type){
                     case "Car":
-                        red = R.drawable.car_r;
-                        yellow = R.drawable.car_y;
-                        green = R.drawable.car_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Humane":
-                        red = R.drawable.human_r;
-                        yellow = R.drawable.human_y;
-                        green = R.drawable.human_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Bike":
-                        red = R.drawable.bike_r;
-                        yellow = R.drawable.bike_b;
-                        green = R.drawable.bike_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Bus":
-                        red = R.drawable.bus_r;
-                        yellow = R.drawable.bus_y;
-                        green = R.drawable.bus_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Truck":
-                        red = R.drawable.truck_r;
-                        yellow = R.drawable.truck_y;
-                        green = R.drawable.truck_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                 }
 
@@ -200,27 +205,26 @@ public class HistoryDetailsActivity extends AppBaseActivity implements OnMapRead
 
                             marker = mMap.addMarker(new MarkerOptions().position(latLng).title(address+"|"+date+"|"
                                     +speedR+"|"+lat+"|"+lang+"|"+name)
-                                    .icon(BitmapDescriptorFactory.fromResource(finalRed)));
+                                    .icon(bitmapDescriptorFromVectorR(HistoryDetailsActivity.this)));
                             markerArrayList.add(marker);
                         } else if (speedR<10){
                             marker = mMap.addMarker(new MarkerOptions().position(latLng).title(address+"|"+date+"|"
                                     +speedR+"|"+lat+"|"+lang+"|"+name)
-                                    .icon(BitmapDescriptorFactory.fromResource(finalYellow)));
+                                    .icon(bitmapDescriptorFromVectorY(HistoryDetailsActivity.this)));
                             markerArrayList.add(marker);
                         } else {
                             marker = mMap.addMarker(new MarkerOptions().position(latLng).title(address+"|"+date+"|"
                                     +speedR+"|"+lat+"|"+lang+"|"+name)
-                                    .icon(BitmapDescriptorFactory.fromResource(finalGreen)));
+                                    .icon(bitmapDescriptorFromVectorG(HistoryDetailsActivity.this)));
                             markerArrayList.add(marker);
                         }
-                        Log.d("TAG", "run: "+markerArrayList.size());
                         builder = new LatLngBounds.Builder();
                         for (Marker m : markerArrayList) {
                             builder.include(m.getPosition());
                         }
-                        LatLngBounds bounds = builder.build();
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
-
+//                        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                .target(new LatLng(Double.parseDouble(lat), Double.parseDouble(lang))).zoom(15f).tilt(60).build();
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(lat), Double.parseDouble(lang)), 16.0f));
                         //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(lat), Double.parseDouble(lang)), 12.0f));
 
                         ArrayList<LatLng> points = new ArrayList<LatLng>();
@@ -240,6 +244,7 @@ public class HistoryDetailsActivity extends AppBaseActivity implements OnMapRead
             Utility.message(getApplicationContext(), "No data found");
         }
     }
+
 
     public void getDeviceDetails(){
         deviceData = new DeviceDetails();
@@ -364,12 +369,5 @@ public class HistoryDetailsActivity extends AppBaseActivity implements OnMapRead
         });
     }
 
-    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
+
 }

@@ -5,8 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,7 +25,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -33,8 +41,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import app.quicktrack.R;
+import app.quicktrack.models.Data;
 import app.quicktrack.models.DeviceDetails;
 import app.quicktrack.models.DeviceMapRequest;
 import app.quicktrack.utils.AppBaseActivity;
@@ -50,8 +62,12 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static app.quicktrack.utils.Utility.bitmapDescriptorFromVectorG;
+import static app.quicktrack.utils.Utility.bitmapDescriptorFromVectorY;
+import static app.quicktrack.utils.Utility.getAddress;
+
 public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyCallback {
-    public static String deviceId, username, pass;
+    public String deviceId, username, pass;
     TinyDB tinyDB ;
     private GoogleMap mMap;
     private static final String TAG = "ServiceMap";
@@ -74,6 +90,9 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         deviceId = getIntent().getStringExtra("deviceId");
+        Data data1 = new Data();
+        data1.setDeviceId(deviceId);
+
         tinyDB = new TinyDB(getApplicationContext());
 
     }
@@ -90,16 +109,19 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
         if (PermissionRequestHandler.requestPermissionToLocation(DeviceDetailActivity.this, null)) {
             checkGPSStatus();
         }
-        setUpMap();
-/*        startService(intent);
-        registerReceiver(broadcastReceiver, new IntentFilter(BroadcastService.BROADCAST_ACTION));*/
+
+
+
+//.................................. start service .....................................//
+        startService(intent);
+        registerReceiver(broadcastReceiver, new IntentFilter(BroadcastService.BROADCAST_ACTION));
     }
 
     @Override
     public void onPause() {
         super.onPause();
-       /* unregisterReceiver(broadcastReceiver);
-        stopService(intent);*/
+        unregisterReceiver(broadcastReceiver);
+        stopService(intent);
     }
 
     private TextView tv_title ;
@@ -125,118 +147,71 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
 
     ArrayList<Marker> markerArrayList = new ArrayList<>();
 
-    public static final MediaType MEDIA_TYPE = MediaType.parse("application/xml");
-    OkHttpClient okHttpClient = new OkHttpClient();
-    public void getDeviceDetails(){
-
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                Utility.showloadingPopup(DeviceDetailActivity.this);
-                DeviceMapRequest deviceMapRequest = new DeviceMapRequest();
-                deviceMapRequest.setDeviceid(deviceId);
-                deviceMapRequest.setLimit(1);
-                Gson gson = new Gson();
-                String data = gson.toJson(deviceMapRequest);
-
-                RequestBody requestBody = RequestBody.create(MEDIA_TYPE,data);
-                final Request request = new Request.Builder()
-                        .url(RetrofitApiBuilder.QUICK_BASE+"mapdata")
-                        .post(requestBody)
-                        .addHeader("Content-Type", "application/json")
-                        .addHeader("cache-control", "no-cache")
-                        .build();
-                okHttpClient.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                String msg = e.getMessage();
-                                Utility.hidepopup();
-                                Log.d("TAG", "onFailure: "+msg);
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        Utility.hidepopup();
-                        String msg = response.body().string();
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                deviceData = gson.fromJson(msg, DeviceDetails.class);
-                                if (deviceData.isStatus()==true){
-                                    setma();
-                                } else {
-                                    Utility.message(mContext, "No data found");
-
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-    }
-
-    private void setUpMap() {
-
-        new Thread(new Runnable() {
-            public void run() {
-                getDeviceDetails();
-            }
-        }).start();
-    }
-
     Gson gson = new Gson();
-
-    public void setma(){
+    String address;
+    public void setma(DeviceDetails deviceData){
 
         if (deviceData.getMessage().equals("success")){
+            if (mMap!=null){
+                mMap.clear();
+            }
             for (DeviceDetails.ResponseBean responseBean: deviceData.getResponse()){
                 String type = responseBean.getType();
                 int red=0, yellow=0, green=0;
                 switch (type){
                     case "Car":
-                        red = R.drawable.car_r;
-                        yellow = R.drawable.car_y;
-                        green = R.drawable.car_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Humane":
-                        red = R.drawable.human_r;
-                        yellow = R.drawable.human_y;
-                        green = R.drawable.human_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Bike":
-                        red = R.drawable.bike_r;
-                        yellow = R.drawable.bike_b;
-                        green = R.drawable.bike_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Bus":
-                        red = R.drawable.bus_r;
-                        yellow = R.drawable.bus_y;
-                        green = R.drawable.bus_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                     case "Truck":
-                        red = R.drawable.truck_r;
-                        yellow = R.drawable.truck_y;
-                        green = R.drawable.truck_g;
+                        red = R.drawable.marker_r;
+                        yellow = R.drawable.marker_y;
+                        green = R.drawable.marker_g;
                         break;
                 }
 
                 String lat = responseBean.getLatitude();
                 String lang = responseBean.getLongitude();
-                String address = responseBean.getAddress();
+                 address = responseBean.getAddress();
+                Log.d("TAG", "getInfoContents: "+address);
+
+                if (address==null){
+                     Geocoder geocoder;
+                     List<Address> addresses = null;
+                     geocoder = new Geocoder(mContext, Locale.getDefault());
+                     try {
+                         addresses = geocoder.getFromLocation(Double.parseDouble(lat), Double.parseDouble(lang), 1);
+                         // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                         address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+                         Log.d("TAG", "getInfoContents: "+address);
+
+                     } catch (IOException e) {
+                         e.printStackTrace();
+                     }
+
+                 }
                 String date = responseBean.getDatetime();
                 String speed = responseBean.getSpeed();
                 double speedR = Utility.getSpeedDouble(Double.parseDouble(speed));
                 String name = responseBean.getDeviceid();
                 LatLng latLng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lang));
+
                 latLngArrayList.add(latLng);
                 int finalRed = red;
                 int finalYellow = yellow;
@@ -248,27 +223,26 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
 
                             marker = mMap.addMarker(new MarkerOptions().position(latLng).title(address+"|"+date+"|"
                                     +speedR+"|"+lat+"|"+lang+"|"+name)
-                                    .icon(BitmapDescriptorFactory.fromResource(finalRed)));
+                                    .icon(Utility.bitmapDescriptorFromVectorR(DeviceDetailActivity.this)));
                             markerArrayList.add(marker);
                         } else if (speedR<10){
                             marker = mMap.addMarker(new MarkerOptions().position(latLng).title(address+"|"+date+"|"
                                     +speedR+"|"+lat+"|"+lang+"|"+name)
-                                    .icon(BitmapDescriptorFactory.fromResource(finalYellow)));
+                                    .icon(bitmapDescriptorFromVectorY(DeviceDetailActivity.this)));
                             markerArrayList.add(marker);
                         } else {
                             marker = mMap.addMarker(new MarkerOptions().position(latLng).title(address+"|"+date+"|"
                                     +speedR+"|"+lat+"|"+lang+"|"+name)
-                                    .icon(BitmapDescriptorFactory.fromResource(finalGreen)));
+                                    .icon(bitmapDescriptorFromVectorG(DeviceDetailActivity.this)));
                             markerArrayList.add(marker);
                         }
                         builder = new LatLngBounds.Builder();
                         for (Marker m : markerArrayList) {
                             builder.include(m.getPosition());
                         }
-                        LatLngBounds bounds = builder.build();
-                  //      mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 70));
-
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(lat), Double.parseDouble(lang)), 12.0f));
+//                        CameraPosition cameraPosition = new CameraPosition.Builder()
+//                                .target(new LatLng(Double.parseDouble(lat), Double.parseDouble(lang))).zoom(15f).tilt(60).build();
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(Double.parseDouble(lat), Double.parseDouble(lang)), 15.0f));
 
                         ArrayList<LatLng> points = new ArrayList<LatLng>();
                         PolylineOptions lineOptions = new PolylineOptions();
@@ -282,18 +256,67 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
                         mMap.addPolyline(lineOptions);
                     }
                 });
+
+                mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                    @Override
+                    public View getInfoWindow(Marker marker) {
+                        return null;
+                    }
+
+                    @Override
+                    public View getInfoContents(Marker marker) {
+                        LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
+                        View view = layoutInflater.inflate(R.layout.marker_view,null);
+                        TextView txtName, txtGps, txtSpeed, txtAddress, txtDate;
+                        txtName = (TextView) view.findViewById(R.id.txtDeviceName);
+                        txtGps = (TextView) view.findViewById(R.id.txtGPS);
+                        txtSpeed = (TextView) view.findViewById(R.id.txtSpeed);
+                        txtAddress = (TextView) view.findViewById(R.id.txtAddress);
+                        txtDate = (TextView) view.findViewById(R.id.txtDate);
+                        String Title=marker.getTitle();
+                        String[] value_split = Title.split("\\|");
+
+                        long timestamp= Long.parseLong(value_split[1]);
+                        String date = Utility.getTime(timestamp);
+                        txtDate.setText("Date/Time: "+date);
+
+                        double latitude = Double.parseDouble(value_split[3]);
+                        double longitude = Double.parseDouble(value_split[4]);
+
+                        String address = Utility.getAddress(mContext, latitude, longitude);
+                        if (value_split[0].length()>0){
+                            txtAddress.setText("Address: "+value_split[0]);
+                        }
+                        else {
+
+                            txtAddress.setText("Address: "+address);
+                        }
+
+                        latitude = Utility.getDouble(latitude);
+                        longitude = Utility.getDouble(longitude);
+                        txtGps.setText("Lat/Long: "+String.valueOf(latitude)+" , "+ String.valueOf(longitude));
+                        txtSpeed.setText("Speed: "+value_split[2]+" kmph");
+                        txtName.setText(value_split[5]);
+                        return view;
+                    }
+                });
+
             }
         } else {
             Utility.message(getApplicationContext(), "No data found");
         }
     }
 
-   /* private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    //.................................. call broadcast  .....................................//
+
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             updateUI(intent);
         }
-    };*/
+    };
+
 
     private void updateUI(Intent intent1) {
         String counter = intent1.getStringExtra("counter");
@@ -302,8 +325,9 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
             JSONObject jsonObject = new JSONObject(counter);
             if (jsonObject.has("status")){
                 if (jsonObject.getString("status").equals("true")){
+                    Log.d(TAG, "updateUI: "+counter);
                     deviceData = gson.fromJson(counter, DeviceDetails.class);
-                    setma();
+                    setma(deviceData);
                 } else {
                     Utility.message(mContext, "No data found");
                     mContext.stopService(intent);
@@ -333,48 +357,6 @@ public class DeviceDetailActivity extends AppBaseActivity implements OnMapReadyC
                 }else if(checkedId == R.id.rb_satellite){
                     mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 }
-            }
-        });
-        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-            @Override
-            public View getInfoWindow(Marker marker) {
-                return null;
-            }
-
-            @Override
-            public View getInfoContents(Marker marker) {
-                LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(LAYOUT_INFLATER_SERVICE);
-                View view = layoutInflater.inflate(R.layout.marker_view,null);
-                TextView txtName, txtGps, txtSpeed, txtAddress, txtDate;
-                txtName = (TextView) view.findViewById(R.id.txtDeviceName);
-                txtGps = (TextView) view.findViewById(R.id.txtGPS);
-                txtSpeed = (TextView) view.findViewById(R.id.txtSpeed);
-                txtAddress = (TextView) view.findViewById(R.id.txtAddress);
-                txtDate = (TextView) view.findViewById(R.id.txtDate);
-                String Title=marker.getTitle();
-                String[] value_split = Title.split("\\|");
-
-                long timestamp= Long.parseLong(value_split[1]);
-                String date = Utility.getTime(timestamp);
-                txtDate.setText("Date/Time: "+date);
-
-                double latitude = Double.parseDouble(value_split[3]);
-                double longitude = Double.parseDouble(value_split[4]);
-
-                String address = Utility.getAddress(mContext, latitude, longitude);
-                if (value_split[0].length()>0){
-                    txtAddress.setText("Address: "+value_split[0]);
-                } else {
-                    txtAddress.setText("Address: "+address);
-
-                }
-
-                latitude = Utility.getDouble(latitude);
-                longitude = Utility.getDouble(longitude);
-                txtGps.setText("Lat/Long: "+String.valueOf(latitude)+" , "+ String.valueOf(longitude));
-                txtSpeed.setText("Speed: "+value_split[2]+" kmph");
-                txtName.setText(value_split[5]);
-                return view;
             }
         });
     }

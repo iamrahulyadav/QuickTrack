@@ -15,6 +15,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
@@ -31,6 +32,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,6 +43,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import app.quicktrack.R;
 
 /**
  * Created by Rakhi.
@@ -65,6 +70,38 @@ public class Utility {
         bitmap.recycle();
 
         return bitmap;
+    }
+
+    public static BitmapDescriptor bitmapDescriptorFromVectorR(Context context) {
+        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_a);
+        background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        //  vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+    public static BitmapDescriptor bitmapDescriptorFromVectorY(Context context) {
+        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_marker_yellow);
+        background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+        //   Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        //    vectorDrawable.setBounds(40, 20, vectorDrawable.getIntrinsicWidth() + 40, vectorDrawable.getIntrinsicHeight() + 20);
+        Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        //  vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+    public static BitmapDescriptor bitmapDescriptorFromVectorG(Context context) {
+        Drawable background = ContextCompat.getDrawable(context, R.drawable.ic_marker_green);
+        background.setBounds(0, 0, background.getIntrinsicWidth(), background.getIntrinsicHeight());
+        //   Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId);
+        //    vectorDrawable.setBounds(40, 20, vectorDrawable.getIntrinsicWidth() + 40, vectorDrawable.getIntrinsicHeight() + 20);
+        Bitmap bitmap = Bitmap.createBitmap(background.getIntrinsicWidth(), background.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        background.draw(canvas);
+        //  vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     public  static String stripLeadingAndTrailingQuotes(String str)
