@@ -9,8 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import app.quicktrack.R;
+import app.quicktrack.models.DeviceData;
+import app.quicktrack.utils.Utility;
 
 /**
  * Created by rakhi
@@ -19,7 +22,7 @@ import app.quicktrack.R;
 
 public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DriverHolder>
 {
-    ArrayList<String> deviceName;
+    List<DeviceData.ResponseBean> devicelist;
     Context mcontext;
     int lastpositon=-1;
     String idd;
@@ -29,8 +32,8 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DriverHold
         void itemClicked(View view, int postion);
     }
 
-    public DeviceAdapter(ArrayList<String> deviceName, Context mcontext) {
-        this.deviceName = deviceName;
+    public DeviceAdapter(List<DeviceData.ResponseBean>devicelist, Context mcontext) {
+        this.devicelist = devicelist;
         this.mcontext = mcontext;
     }
 
@@ -42,8 +45,11 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DriverHold
 
     @Override
     public void onBindViewHolder(DriverHolder holder, int position) {
-        holder.dr_name.setText(deviceName.get(position));
-        switch (deviceName.get(position)){
+        holder.dr_name.setText(devicelist.get(position).getDeviceid());
+        String s = Utility.getAddress(mcontext, Double.parseDouble(devicelist.get(position).getLatitude()),
+                Double.parseDouble(devicelist.get(position).getLongitude()));
+        holder.txt_address.setText(s);
+        switch (devicelist.get(position).getType()){
             case "Truck":
                 holder.dr_img.setBackgroundResource(R.drawable.ic_truck);
                 break;
@@ -86,16 +92,20 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DriverHold
 
     @Override
     public int getItemCount() {
-        return deviceName.size();
+        return devicelist.size();
     }
 
     class DriverHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView dr_name,dr_email,dr_phnumber,dr_Age,dr_id;
+        TextView dr_name,txt_address,dr_phnumber,dr_Age,dr_id;
         ImageView dr_img,ar_img;
         public DriverHolder(View itemView) {
             super(itemView);
             dr_name= (TextView) itemView.findViewById(R.id.devicename);
             dr_img = (ImageView) itemView.findViewById(R.id.imgdevice);
+
+//            change by rakhi 02/07/2018 add address of device
+
+            txt_address = itemView.findViewById(R.id.device_address);
             itemView.setOnClickListener(this);
         }
 

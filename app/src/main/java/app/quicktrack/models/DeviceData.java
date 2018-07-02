@@ -11,7 +11,7 @@ public class DeviceData {
 
     /**
      * message : success
-     * response : [{"deviceid":"gt02a"},{"deviceid":"tk103"}]
+     * response : [{"deviceid":"as01dd0092","type":"Truck","latitude":"25.95671777777778","longitude":"91.85204444444445"},{"deviceid":"as01jc3192","type":"Truck","latitude":"25.58773777777778","longitude":"92.0614311111111"},{"deviceid":"as01jc3592","type":"Truck","latitude":"25.013124444444443","longitude":"92.50256"}]
      * status : true
      */
 
@@ -45,10 +45,16 @@ public class DeviceData {
 
     public static class ResponseBean {
         /**
-         * deviceid : gt02a
+         * deviceid : as01dd0092
+         * type : Truck
+         * latitude : 25.95671777777778
+         * longitude : 91.85204444444445
          */
 
         private String deviceid;
+        private String type;
+        private String latitude;
+        private String longitude;
 
         public String getDeviceid() {
             return deviceid;
@@ -56,6 +62,30 @@ public class DeviceData {
 
         public void setDeviceid(String deviceid) {
             this.deviceid = deviceid;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getLatitude() {
+            return latitude;
+        }
+
+        public void setLatitude(String latitude) {
+            this.latitude = latitude;
+        }
+
+        public String getLongitude() {
+            return longitude;
+        }
+
+        public void setLongitude(String longitude) {
+            this.longitude = longitude;
         }
     }
 }

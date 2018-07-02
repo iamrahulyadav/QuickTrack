@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import app.quicktrack.R;
@@ -55,6 +56,8 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
     final OkHttpClient okHttpClient = new OkHttpClient();
     Context mContext;
     public ArrayList<String>device = new ArrayList<>();
+    private List<DeviceData.ResponseBean> devicelist ;
+
     TinyDB tinyDB ;
     LoginResponse loginResponse = new LoginResponse();
     Gson gson = new Gson();
@@ -76,6 +79,7 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
 
 
         mContext = this;
+        devicelist = new ArrayList<>();
         tinyDB = new TinyDB(getApplicationContext());
         String data = tinyDB.getString("login_Data");
         imgDate = (ImageView) findViewById(R.id.imgCalender);
@@ -125,7 +129,7 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
     protected void onResume() {
         super.onResume();
         setupTitle("Track History") ;
-        deviceAdapter = new DeviceAdapter(device,mContext);
+        deviceAdapter = new DeviceAdapter(devicelist,mContext);
         RecyclerView.LayoutManager manager= new LinearLayoutManager(this);
         recyclerView.setLayoutManager(manager);
         deviceAdapter.setClickListene(this);
@@ -142,11 +146,13 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
         updateLabel();
     }
 
+    private DeviceData deviceData = new DeviceData();
 
-    public void getDeviceList(){
-        if (device!=null){
-            device.clear();
+    private void getDeviceList(){
+        if (devicelist!=null){
+            devicelist.clear();
         }
+
         DeviceListRequest deviceListRequest = new DeviceListRequest();
         deviceListRequest.setResellerid(resellerid);
         deviceListRequest.setType(type);
@@ -164,9 +170,14 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                String msg = e.getMessage();
-                Utility.message(getApplicationContext(), "Connection error ");
-                Utility.hidepopup();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String msg = e.getMessage();
+                        Utility.message(getApplicationContext(), "Connection error ");
+                        Utility.hidepopup();
+                    }
+                });
             }
 
             @Override
@@ -174,20 +185,19 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
                 Utility.hidepopup();
                 if (response!=null){
                     String msg = response.body().string();
-                    DeviceData deviceData = new DeviceData();
 
                     deviceData = gson.fromJson(msg,DeviceData.class);
                     DeviceData finalDeviceData = deviceData;
+
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             ArrayList<String> a = new ArrayList<>();
-                            for (DeviceData.ResponseBean responseBean: finalDeviceData.getResponse()){
-                                a.add(responseBean.getDeviceid());
+                            if (deviceData.isStatus()){
+                                devicelist.addAll(deviceData.getResponse());
+                                deviceAdapter.notifyDataSetChanged();
                             }
-                            device.addAll(a);
-                            deviceAdapter.notifyDataSetChanged();
                         }
                     });
                 }
@@ -223,7 +233,7 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
 
     @Override
     public void itemClicked(View view, int postion) {
-        String deviceId = device.get(postion);
+        String deviceId = devicelist.get(postion).getDeviceid();
         Intent intent = new Intent(TrackHistoryActivity.this, HistoryDetailsActivity.class);
         intent.putExtra("deviceId", deviceId);
         intent.putExtra("selectedDate",selectedDate);

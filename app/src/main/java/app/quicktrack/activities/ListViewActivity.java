@@ -18,6 +18,7 @@ import com.mukesh.tinydb.TinyDB;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import app.quicktrack.R;
@@ -41,7 +42,8 @@ public class ListViewActivity extends AppCompatActivity implements DeviceAdapter
     public static final MediaType MEDIA_TYPE = MediaType.parse("application/json");
     final OkHttpClient okHttpClient = new OkHttpClient();
         Context mContext;
-    public ArrayList<String>device = new ArrayList<>();
+    private ArrayList<String>device = new ArrayList<>();
+    private List<DeviceData.ResponseBean>devicelist ;
     TinyDB tinyDB ;
     LoginResponse loginResponse = new LoginResponse();
     Gson gson = new Gson();
@@ -58,6 +60,7 @@ public class ListViewActivity extends AppCompatActivity implements DeviceAdapter
         mContext = this;
         tinyDB = new TinyDB(getApplicationContext());
         String data = tinyDB.getString("login_Data");
+        devicelist = new ArrayList<>();
 
         loginResponse = gson.fromJson(data, LoginResponse.class);
         type = loginResponse.getResponse().getType();
@@ -95,7 +98,7 @@ public class ListViewActivity extends AppCompatActivity implements DeviceAdapter
     protected void onResume() {
         super.onResume();
             setupTitle("List View") ;
-            deviceAdapter = new DeviceAdapter(device,mContext);
+            deviceAdapter = new DeviceAdapter(devicelist,mContext);
             RecyclerView.LayoutManager manager= new LinearLayoutManager(this);
             recyclerView.setLayoutManager(manager);
             deviceAdapter.setClickListene(this);
@@ -104,10 +107,11 @@ public class ListViewActivity extends AppCompatActivity implements DeviceAdapter
             getDeviceList();
 
     }
+   private DeviceData deviceData = new DeviceData();
 
     public void getDeviceList(){
-        if (device!=null){
-            device.clear();
+        if (devicelist!=null){
+            devicelist.clear();
         }
         DeviceListRequest deviceListRequest = new DeviceListRequest();
         deviceListRequest.setResellerid(resellerid);
@@ -149,19 +153,18 @@ public class ListViewActivity extends AppCompatActivity implements DeviceAdapter
                 if (response!=null&&response.body().toString().length()>0){
                     String msg = response.body().string();
                     Log.d("TAG", "onResponse: "+msg);
-                    DeviceData deviceData = new DeviceData();
                     deviceData = gson.fromJson(msg,DeviceData.class);
-                    DeviceData finalDeviceData = deviceData;
+
 
                     runOnUiThread(new Runnable() {
                        @Override
                        public void run() {
                            ArrayList<String> a = new ArrayList<>();
-                           for (DeviceData.ResponseBean responseBean: finalDeviceData.getResponse()){
-                               a.add(responseBean.getDeviceid());
+                           if (deviceData.isStatus()){
+                               devicelist.addAll(deviceData.getResponse());
+                               deviceAdapter.notifyDataSetChanged();
                            }
-                           device.addAll(a);
-                           deviceAdapter.notifyDataSetChanged();
+                         //  device.addAll(a);
                        }
                    });
                 }
@@ -171,7 +174,7 @@ public class ListViewActivity extends AppCompatActivity implements DeviceAdapter
 
     @Override
     public void itemClicked(View view, int postion) {
-        String deviceId = device.get(postion);
+        String deviceId = devicelist.get(postion).getDeviceid();
         Intent intent = new Intent(ListViewActivity.this, DeviceDetailActivity.class);
         intent.putExtra("deviceId", deviceId);
         startActivity(intent);
