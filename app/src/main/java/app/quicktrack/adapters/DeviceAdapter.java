@@ -49,6 +49,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DriverHold
         String s = Utility.getAddress(mcontext, Double.parseDouble(devicelist.get(position).getLatitude()),
                 Double.parseDouble(devicelist.get(position).getLongitude()));
         holder.txt_address.setText(s);
+/*
         switch (devicelist.get(position).getType()){
             case "Truck":
                 holder.dr_img.setBackgroundResource(R.drawable.ic_truck);
@@ -67,6 +68,7 @@ public class DeviceAdapter extends RecyclerView.Adapter<DeviceAdapter.DriverHold
 
                 break;
         }
+*/
       /*  if (position > 0) {
             holder.ar_img.setImageResource(R.drawable.ic_blue_arrow);
             holder.ar_img.setBackgroundColor(mcontext.getResources().getColor(R.color.Light_grey));

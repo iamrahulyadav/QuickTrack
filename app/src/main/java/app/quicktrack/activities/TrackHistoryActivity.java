@@ -16,6 +16,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import app.quicktrack.R;
 import app.quicktrack.adapters.DeviceAdapter;
@@ -157,7 +159,13 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
         deviceListRequest.setResellerid(resellerid);
         deviceListRequest.setType(type);
         String data = gson.toJson(responseBean);
+        Log.d("TAG", "rakhi: "+data);
         RequestBody requestBody = RequestBody.create(MEDIA_TYPE,data);
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10000, TimeUnit.SECONDS)
+                .writeTimeout(10000, TimeUnit.SECONDS)
+                .readTimeout(30000, TimeUnit.SECONDS)
+                .build();
 
         final Request request = new Request.Builder()
                 .url(RetrofitApiBuilder.QUICK_BASE+"devices_list")
@@ -167,7 +175,7 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
                 .build();
 
         Utility.showloadingPopup(this);
-        okHttpClient.newCall(request).enqueue(new Callback() {
+        client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 runOnUiThread(new Runnable() {
@@ -188,8 +196,6 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
 
                     deviceData = gson.fromJson(msg,DeviceData.class);
                     DeviceData finalDeviceData = deviceData;
-
-
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
