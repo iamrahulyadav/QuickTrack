@@ -499,6 +499,7 @@ public class MapViewActivity extends AppBaseActivity implements OnMapReadyCallba
                             for (DeviceData.ResponseBean responseBean: finalDeviceData.getResponse()){
                                 a.add(responseBean.getDeviceid());
                             }
+                            device.clear();
                             device.addAll(a);
                             arrayAdapter.notifyDataSetChanged();
                         }

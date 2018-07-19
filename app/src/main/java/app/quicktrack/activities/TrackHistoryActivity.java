@@ -178,6 +178,7 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -186,6 +187,7 @@ public class TrackHistoryActivity extends AppBaseActivity implements DeviceAdapt
                         Utility.hidepopup();
                     }
                 });
+
             }
 
             @Override
